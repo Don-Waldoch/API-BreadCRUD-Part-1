@@ -6,7 +6,9 @@ function Show ({bread, bakedBy}) {
   // console.log(bread.name)
     return (
       <Default>
-        <h3>{bread.name}</h3>
+        {bread.name &&
+          <h3>{bread.name}</h3>
+        }
         <p>
           and it
           {

@@ -5,28 +5,22 @@ const Baker = require('../models/baker.js')
 const breadSeedData = require('../models/seed.js')
 
 // INDEX
-breads.get('/', (req, res) => {
-  Baker.find()
-    .then(foundBakers => {
-      Bread.find()
-      .then(foundBreads => {
-          res.render('index', {
-              breads: foundBreads,
-              bakers: foundBakers,
-              title: 'Index Page'
-          })
-      })
-    })
+breads.get('/', async (req, res) => {
+  const foundBakers = await Baker.find().lean()
+  const foundBreads = await Bread.find().limit(5).lean()
+  res.render('index', {
+    breads: foundBreads,
+    bakers: foundBakers,
+    title: 'Index Page'
+  })
 })
 
 // NEW
 breads.get('/new', (req, res) => {
-    Baker.find()
-      .then(foundBakers => {
-        res.render('new', {
-          bakers: foundBakers
-        })
-      })
+  Baker.find()
+    .then(foundBakers => {
+      res.render('new', { bakers: foundBakers })
+  })
 })
 
 // SHOW
@@ -35,7 +29,7 @@ breads.get('/:id', (req, res) => {
       .populate('baker')
       .then(foundBread => {
         res.render('show', {
-            bread: foundBread
+          bread: foundBread
         })
       })
       .catch(err => {
@@ -50,10 +44,10 @@ breads.get('/:id/edit', (req, res) => {
         Bread.findById(req.params.id)
           .then(foundBread => {
             res.render('edit', {
-                bread: foundBread, 
-                bakers: foundBakers
-            })
+              bread: foundBread, 
+              bakers: foundBakers
           })
+        })
     })
 })
 
@@ -74,7 +68,7 @@ breads.put('/:id', (req, res) => {
 // CREATE
 breads.post('/', (req, res) => {
   if(!req.body.image) {
-      req.body.image = undefined 
+    req.body.image = undefined 
   }
   if(req.body.hasGluten === 'on') {
     req.body.hasGluten = true
@@ -90,7 +84,7 @@ breads.delete('/:id', (req, res) => {
   Bread.findByIdAndDelete(req.params.id) 
     .then(deletedBread => { 
       res.status(303).redirect('/breads')
-    })
+  })
 })
 
 // SEED ROUTE 
@@ -98,7 +92,7 @@ breads.get('/data/seed', (req, res) => {
   Bread.insertMany(breadSeedData)
     .then(createdBreads => {
       res.redirect('/breads')
-    })
+  })
 })
 
 module.exports = breads
